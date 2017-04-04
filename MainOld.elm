@@ -1,7 +1,5 @@
 module Main exposing (..)
 
-import Deck exposing (Card, generateDeck, deal, shuffleDeck, Facing(..), displayCard)
-import Rules exposing (GameState(..), calculateScore, displayScore)
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Random
@@ -19,6 +17,45 @@ main =
 
 
 -- MODEL
+
+
+type alias Card =
+    { index : Int
+    , suit : String
+    , rank : Int
+    , facing : Facing
+    }
+
+
+generateDeck : List Card
+generateDeck =
+    let
+        deckIndex =
+            12 * 4 |> List.range 1
+
+        suits =
+            [ "Spades", "Clubs", "Diamonds", "Hearts" ] |> List.repeat 12 |> List.concat |> List.sort
+
+        ranks =
+            List.range 2 13 |> List.repeat 4 |> List.concat
+    in
+        List.map3 createCard deckIndex suits ranks
+
+
+createCard : Int -> String -> Int -> Card
+createCard index rank suit =
+    Card index rank suit Down
+
+
+type Facing
+    = Down
+    | Up
+
+
+type GameState
+    = Playing
+    | Won
+    | Lost
 
 
 type alias Model =
@@ -47,6 +84,37 @@ newGame =
 
 
 -- UPDATE
+
+
+calculateScore : List Card -> List Card -> GameState
+calculateScore player dealer =
+    let
+        player_ranks =
+            player
+                |> List.map .rank
+
+        player_result =
+            player_ranks
+                |> List.foldr (+) 0
+
+        dealer_ranks =
+            dealer
+                |> List.map .rank
+
+        dealer_result =
+            dealer_ranks
+                |> List.foldr (+) 0
+    in
+        if player_result > 21 then
+            Lost
+        else if player_result == 21 then
+            Won
+        else if dealer_result > 21 then
+            Won
+        else if dealer_result > player_result then
+            Lost
+        else
+            Playing
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -111,6 +179,26 @@ update msg model =
             newGame
 
 
+deal : List Card -> ( Maybe Card, Maybe (List Card) )
+deal deck =
+    let
+        dealtCard =
+            List.head deck
+
+        restOfDeck =
+            List.tail deck
+    in
+        ( dealtCard, restOfDeck )
+
+
+shuffleDeck : List Card -> List comparable -> List Card
+shuffleDeck deck xs =
+    List.map2 (,) deck xs
+        |> List.sortBy Tuple.second
+        |> List.unzip
+        |> Tuple.first
+
+
 
 -- VIEW
 
@@ -143,6 +231,47 @@ view model =
             ]
         ]
 
+
+displayScore : List Card -> String
+displayScore hand =
+    let
+        ranks =
+            hand
+                |> List.map .rank
+
+        result =
+            ranks
+                |> List.foldr (+) 0
+    in
+        -- Need to define this rule better
+        if result > 21 then
+            toString result ++ ": Bust"
+        else if result == 21 then
+            toString result ++ ": Blackjack"
+        else
+            toString result
+
+
+displayCard : Card -> String
+displayCard card =
+    if card.facing == Down then
+        "CARD"
+    else
+        case card.rank of
+            13 ->
+                "Ace of " ++ card.suit
+
+            12 ->
+                "King of " ++ card.suit
+
+            11 ->
+                "Queen of " ++ card.suit
+
+            10 ->
+                "Jack of " ++ card.suit
+
+            _ ->
+                toString card.rank ++ " of " ++ card.suit
 
 
 randomList : (List Int -> Msg) -> Int -> Cmd Msg
