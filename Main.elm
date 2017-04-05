@@ -5,6 +5,8 @@ import Rules exposing (GameState(..), calculateScore, displayScore)
 import Html exposing (..)
 import Html.Events exposing (onClick)
 import Random
+import Svg
+import Svg.Attributes as SvgAtt
 
 
 -- Need to put deck stuff in own module exposing creating, dealing, shuffling and sorting methods
@@ -45,6 +47,12 @@ newGame =
     )
 
 
+randomList : (List Int -> Msg) -> Int -> Cmd Msg
+randomList msg len =
+    Random.int 1 48
+        |> Random.list len
+        |> Random.generate msg
+
 
 -- UPDATE
 
@@ -78,7 +86,7 @@ update msg model =
                                     newHands =
                                         { model | player_hand = { card | facing = Up } :: model.player_hand, deck = cards }
                                 in
-                                    ( { newHands | game_state = calculateScore newHands.player_hand newHands.dealer_hand }, Cmd.none )
+                                    ( { newHands | game_state = calculateScore Playing newHands.player_hand newHands.dealer_hand }, Cmd.none )
 
                             Nothing ->
                                 model ! []
@@ -99,7 +107,7 @@ update msg model =
                                     newHands =
                                         { model | dealer_hand = { card | facing = Up } :: model.dealer_hand, deck = cards }
                                 in
-                                    ( { newHands | game_state = calculateScore newHands.player_hand newHands.dealer_hand }, Cmd.none )
+                                    ( { newHands | game_state = calculateScore Staying newHands.player_hand newHands.dealer_hand }, Cmd.none )
 
                             Nothing ->
                                 model ! []
@@ -141,12 +149,57 @@ view model =
                     [ button [ onClick Restart ] [ text "Play Again" ]
                     ]
             ]
+        , Svg.svg
+            [ SvgAtt.width "1200", SvgAtt.height "1200", SvgAtt.viewBox "0 0 1200 1200" ]
+            [ Svg.g []
+                [ Svg.rect
+                    [ SvgAtt.x "10"
+                    , SvgAtt.y "10"
+                    , SvgAtt.width "85"
+                    , SvgAtt.height "100"
+                    , SvgAtt.rx "10"
+                    , SvgAtt.ry "10"
+                    , SvgAtt.fill "white"
+                    , SvgAtt.stroke "black"
+                    , SvgAtt.strokeWidth "4"
+                    ]
+                    []
+                , Svg.text_ [ SvgAtt.textAnchor "middle", SvgAtt.transform "translate(70,35)" ] [ Svg.text "2 C" ]
+                ]
+            , Svg.g [ SvgAtt.transform "translate(100,0)" ]
+                [ Svg.rect
+                    [ SvgAtt.x "10"
+                    , SvgAtt.y "10"
+                    , SvgAtt.width "85"
+                    , SvgAtt.height "100"
+                    , SvgAtt.rx "10"
+                    , SvgAtt.ry "10"
+                    , SvgAtt.style "fill:white;stroke:black;stroke-width:4"
+                    ]
+                    []
+                , Svg.text_ [ SvgAtt.textAnchor "middle", SvgAtt.transform "translate(70,35)" ] [ Svg.text "3 C" ]
+                ]
+            ]
         ]
 
 
+svgCard : Card -> Html Msg
+svgCard card =
+    Svg.svg
+        [ SvgAtt.width "1200", SvgAtt.height "1200", SvgAtt.viewBox "0 0 1200 1200" ]
+        [ Svg.g []
+            [ Svg.rect
+                [ SvgAtt.x "10"
+                , SvgAtt.y "10"
+                , SvgAtt.width "85"
+                , SvgAtt.height "100"
+                , SvgAtt.rx "10"
+                , SvgAtt.ry "10"
+                , SvgAtt.style "fill:white;stroke:black;stroke-width:4"
+                ]
+                []
+            , Svg.text_ [ SvgAtt.textAnchor "middle", SvgAtt.transform "translate(70,35)" ] [ Svg.text <| (toString card.rank) ++ " " ++ card.suit ]
+            ]
+        ]
 
-randomList : (List Int -> Msg) -> Int -> Cmd Msg
-randomList msg len =
-    Random.int 1 48
-        |> Random.list len
-        |> Random.generate msg
+

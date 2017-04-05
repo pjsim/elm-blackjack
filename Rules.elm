@@ -5,12 +5,13 @@ import Deck exposing (Card)
 
 type GameState
     = Playing
+    | Staying
     | Won
     | Lost
 
 
-calculateScore : List Card -> List Card -> GameState
-calculateScore player dealer =
+calculateScore : GameState -> List Card -> List Card -> GameState
+calculateScore game_state player dealer =
     let
         player_ranks =
             player
@@ -34,10 +35,12 @@ calculateScore player dealer =
             Won
         else if dealer_result > 21 then
             Won
+        else if player_result > dealer_result && game_state == Staying then
+            Won
         else if dealer_result > player_result then
             Lost
         else
-            Playing
+            game_state
 
 
 displayScore : List Card -> String
