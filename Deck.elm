@@ -18,13 +18,13 @@ generateDeck : List Card
 generateDeck =
     let
         deckIndex =
-            12 * 4 |> List.range 1
+            13 * 4 |> List.range 1
 
         suits =
             [ "Spades", "Clubs", "Diamonds", "Hearts" ] |> List.repeat 12 |> List.concat |> List.sort
 
         ranks =
-            List.range 2 13 |> List.repeat 4 |> List.concat
+            List.range 1 13 |> List.repeat 4 |> List.concat
     in
         List.map3 createCard deckIndex suits ranks
 
@@ -37,7 +37,6 @@ createCard index rank suit =
 type Facing
     = Down
     | Up
-
 
 
 deal : List Card -> ( Maybe Card, Maybe (List Card) )
@@ -66,18 +65,17 @@ displayCard card =
         "CARD"
     else
         case card.rank of
-            13 ->
+            1 ->
                 "Ace of " ++ card.suit
 
-            12 ->
+            13 ->
                 "King of " ++ card.suit
 
-            11 ->
+            12 ->
                 "Queen of " ++ card.suit
 
-            10 ->
+            11 ->
                 "Jack of " ++ card.suit
 
             _ ->
                 toString card.rank ++ " of " ++ card.suit
-

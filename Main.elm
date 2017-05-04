@@ -9,10 +9,6 @@ import Svg
 import Svg.Attributes as SvgAtt
 
 
--- Need to put deck stuff in own module exposing creating, dealing, shuffling and sorting methods
--- Need to use svg for cards and have Main focus on game and playing states
--- Put card stuff in own file and maybe game rules in own file
-
 
 main : Program Never Model Msg
 main =
