@@ -21,7 +21,7 @@ generateDeck =
             13 * 4 |> List.range 1
 
         suits =
-            [ "Spades", "Clubs", "Diamonds", "Hearts" ] |> List.repeat 12 |> List.concat |> List.sort
+            [ "Spades", "Clubs", "Diamonds", "Hearts" ] |> List.repeat 13 |> List.concat |> List.sort
 
         ranks =
             List.range 1 13 |> List.repeat 4 |> List.concat
